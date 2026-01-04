@@ -1,6 +1,16 @@
 # Opinion CLI
 
-Command line interface for Opinion prediction market.
+**Powerful command line interface for Opinion prediction market**
+
+Monitor markets, analyze positions, track trades, and manage your portfolio with ease. Get real-time insights into any user's trading activity by wallet address, view your own balances and orders, with upcoming trading features to open/close positions and manage orders.
+
+## Features
+
+✅ **Market Analysis** - Browse and analyze prediction markets with advanced filtering  
+✅ **Portfolio Tracking** - View positions and trades for any wallet address  
+✅ **Personal Dashboard** - Check your balances and manage your orders  
+✅ **Real-time Data** - Live market data with automatic pagination  
+🚧 **Trading Functions** - Open/close positions, cancel orders *(coming soon)*
 
 [![GitHub Repository](https://img.shields.io/badge/GitHub-monakki%2Fopinion--cli-blue?logo=github)](https://github.com/monakki/opinion-cli)
 [![Python](https://img.shields.io/badge/Python-3.14+-blue?logo=python)](https://python.org)

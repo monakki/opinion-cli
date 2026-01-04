@@ -1,5 +1,5 @@
 """Client module for Opinion CLI."""
 
-from .opinion_client import OpinionClientWrapper
+from .opinion_clob_client import OpinionClobClientWrapper
 
-__all__ = ["OpinionClientWrapper"]
+__all__ = ["OpinionClobClientWrapper"]

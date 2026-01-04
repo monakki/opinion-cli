@@ -97,6 +97,19 @@ MULTI_SIG_ADDRESS=your_actual_multisig_address
 
 ## Usage
 
+### Help Commands
+
+Show available commands and general help:
+```bash
+uv run help
+```
+
+Get detailed help for specific commands:
+```bash
+uv run config --help
+uv run balance --help
+```
+
 ### Configuration Commands
 
 Show current configuration and test connection:
@@ -104,35 +117,42 @@ Show current configuration and test connection:
 uv run config
 ```
 
-### Available Commands
+### Balance Commands
 
+Show user's token balances:
 ```bash
-# Show help for main CLI
-uv run opinion-cli --help
+# Table format (default) - beautiful Rich tables
+uv run balance
 
-# Show configuration and test connection
-uv run config
+# JSON format
+uv run balance --json
+uv run balance -j
 ```
 
 ## Project Structure
 
 ```
 opinion-cli/
-├── client/                 # Opinion client wrapper
+├── client/                    # Opinion CLOB client wrapper
 │   ├── __init__.py
-│   └── opinion_client.py
-├── commands/              # CLI commands
+│   └── opinion_clob_client.py # CLOB client wrapper
+├── commands/                  # CLI commands
 │   ├── __init__.py
-│   └── config.py         # Configuration commands
-├── config/               # Configuration management
+│   ├── base.py               # Base command functionality
+│   ├── config.py             # Configuration commands
+│   ├── balance.py            # Balance commands
+│   └── help.py               # Help commands
+├── config/                   # Configuration management
 │   ├── __init__.py
-│   └── settings.py       # Settings and OpinionConfig class
-├── utils/                # Utilities
+│   ├── constants.py          # Configuration constants
+│   └── settings.py           # Settings and OpinionConfig class
+├── utils/                    # Utilities
 │   ├── __init__.py
-│   └── formatters.py     # Output formatting
-├── main.py              # CLI entry point
-├── .env.example         # Environment variables template
-└── pyproject.toml       # Project configuration
+│   ├── exceptions.py         # Custom exceptions
+│   └── formatters.py         # Output formatting
+├── cli.py                    # CLI entry point
+├── .env.example              # Environment variables template
+└── pyproject.toml            # Project configuration
 ```
 
 ## Environment Variables

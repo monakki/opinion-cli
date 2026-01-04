@@ -1,22 +1,22 @@
-"""Opinion client wrapper with enhanced functionality."""
+"""Opinion CLOB client wrapper with enhanced functionality."""
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, Optional, Any
 from opinion_clob_sdk import Client
 from config.settings import OpinionConfig
 from config.constants import DUMMY_PRIVATE_KEY
 
 
-class OpinionClientWrapper:
+class OpinionClobClientWrapper:
     """Wrapper around Opinion CLOB SDK client with additional CLI-friendly methods."""
 
     def __init__(self, config: OpinionConfig):
-        """Initialize the client wrapper with configuration."""
+        """Initialize the CLOB client wrapper with configuration."""
         self.config = config
         self._client: Optional[Client] = None
 
     @property
     def client(self) -> Client:
-        """Lazy initialization of the Opinion client."""
+        """Lazy initialization of the Opinion CLOB client."""
         if self._client is None:
             self._client = self.config.create_client()
         return self._client
@@ -41,36 +41,45 @@ class OpinionClientWrapper:
         }
 
     def test_connection(self) -> Dict[str, Any]:
-        """Test connection to Opinion API."""
+        """Test connection to Opinion CLOB API."""
         try:
             # Try to get markets to test connection
-            markets = self.client.get_markets()
+            self.client.get_markets()
+
+            # If we got here without exception, connection is successful
             return {
                 "status": "success",
-                "message": "Successfully connected to Opinion API",
-                "markets_count": len(markets) if markets else 0,
+                "message": "Successfully connected to Opinion CLOB API",
             }
         except Exception as e:
             return {"status": "error", "message": f"Failed to connect: {str(e)}"}
 
-    def get_markets(self) -> List[Dict[str, Any]]:
-        """Get all available markets."""
+    def get_markets(self) -> Any:
+        """Get all available markets.
+
+        Returns the raw response from Opinion CLOB API.
+        The response structure may vary depending on the API version.
+        """
         return self.client.get_markets()
 
-    def get_market_info(self, market_id: str) -> Dict[str, Any]:
+    def get_market_info(self, market_id: str) -> Any:
         """Get detailed information about a specific market."""
         return self.client.get_market(market_id)
 
-    def get_orders(self) -> List[Dict[str, Any]]:
+    def get_orders(self) -> Any:
         """Get user's orders."""
         return self.client.get_orders()
 
-    def get_positions(self) -> List[Dict[str, Any]]:
+    def get_positions(self) -> Any:
         """Get user's positions."""
         return self.client.get_positions()
 
+    def get_balances(self) -> Any:
+        """Get user's token balances."""
+        return self.client.get_my_balances()
+
     @classmethod
-    def from_env(cls) -> "OpinionClientWrapper":
-        """Create client wrapper from environment variables."""
+    def from_env(cls) -> "OpinionClobClientWrapper":
+        """Create CLOB client wrapper from environment variables."""
         config = OpinionConfig.from_env()
         return cls(config)

@@ -23,7 +23,7 @@ from .constants import (
 
 @dataclass
 class OpinionConfig:
-    """Configuration class for Opinion prediction market client."""
+    """Configuration class for Opinion CLOB prediction market client."""
 
     api_key: str
     rpc_url: str
@@ -80,7 +80,7 @@ class OpinionConfig:
         )
 
     def create_client(self) -> Client:
-        """Create Opinion Client from this configuration.
+        """Create Opinion CLOB Client from this configuration.
 
         By default, creates client with no caching for real-time monitoring.
         """
@@ -100,6 +100,20 @@ class OpinionConfig:
         """Validate configuration parameters."""
         if not self.api_key:
             raise ValueError("API key is required")
+
+        # Validate chain_id is positive
+        if self.chain_id <= 0:
+            raise ValueError("Chain ID must be positive")
+
+        # Validate URLs if provided
+        if self.rpc_url and not (
+            self.rpc_url.startswith("http://") or self.rpc_url.startswith("https://")
+        ):
+            raise ValueError("RPC URL must start with http:// or https://")
+
+        if not (self.host.startswith("http://") or self.host.startswith("https://")):
+            raise ValueError("Host URL must start with http:// or https://")
+
         return True
 
     def is_read_only_mode(self) -> bool:

@@ -22,12 +22,14 @@ dependencies = [
    "click>=8.3.1",
    "opinion-clob-sdk>=0.4.3",
    "python-dotenv>=1.2.1",
+   "rich>=14.2.0",
    "ruff>=0.14.10",
 ]
 
 [project.scripts]
-opinion-cli = "main:main"
-config = "config_cli:main"
+config = "cli:main"
+balance = "cli:main"
+help = "cli:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -38,3 +40,4 @@ package = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["client", "commands", "config", "utils"]
+include = ["cli.py"]

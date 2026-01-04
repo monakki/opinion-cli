@@ -25,6 +25,9 @@ dependencies = [
    "rich>=14.2.0",
    "ruff>=0.14.10",
    "aiolimiter>=1.1.0",
+   "httpx>=0.28.1",
+   "loguru>=0.7.3",
+   "pydantic>=2.12.5",
 ]
 
 [project.scripts]
@@ -40,5 +43,5 @@ build-backend = "hatchling.build"
 package = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["client", "commands", "config", "utils"]
+packages = ["clients", "commands", "config", "utils"]
 include = ["cli.py"]

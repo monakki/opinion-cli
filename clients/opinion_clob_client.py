@@ -23,7 +23,7 @@ class OpinionClobClientWrapper:
     def client(self) -> Client:
         """Lazy initialization of the Opinion CLOB client."""
         if self._client is None:
-            self._client = self.config.create_client()
+            self._client = self.config.create_clob_client()
         return self._client
 
     async def _rate_limited_call(self, func, *args, **kwargs):
@@ -51,6 +51,7 @@ class OpinionClobClientWrapper:
             "quote_tokens_cache_ttl": self.config.quote_tokens_cache_ttl,
             "enable_trading_check_interval": self.config.enable_trading_check_interval,
             "rate_limit": self.config.rate_limit,
+            "timeout": self.config.timeout,
             "realtime_mode": self.config.market_cache_ttl == 0,  # True if no caching
             "read_only_mode": self.config.is_read_only_mode(),
             "can_trade": self.config.can_trade(),

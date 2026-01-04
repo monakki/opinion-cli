@@ -3,7 +3,7 @@
 import click
 import os
 from typing import Callable, Any
-from client.opinion_clob_client import OpinionClobClientWrapper
+from clients.opinion_clob_client import OpinionClobClientWrapper
 from config.constants import DUMMY_PRIVATE_KEY
 
 

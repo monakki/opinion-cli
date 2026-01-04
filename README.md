@@ -133,9 +133,11 @@ uv run balance -j
 
 ```
 opinion-cli/
-├── client/                    # Opinion CLOB client wrapper
+├── clients/                   # Opinion API clients
 │   ├── __init__.py
-│   └── opinion_clob_client.py # CLOB client wrapper
+│   ├── models.py             # Pydantic data models
+│   ├── opinion_api_client.py # Open API client (async)
+│   └── opinion_clob_client.py # CLOB SDK client wrapper
 ├── commands/                  # CLI commands
 │   ├── __init__.py
 │   ├── base.py               # Base command functionality
@@ -144,8 +146,9 @@ opinion-cli/
 │   └── help.py               # Help commands
 ├── config/                   # Configuration management
 │   ├── __init__.py
-│   ├── constants.py          # Configuration constants
-│   └── settings.py           # Settings and OpinionConfig class
+│   ├── constants.py          # All constants and enums
+│   ├── settings.py           # Unified OpinionConfig class
+│   └── validators.py         # Input validation utilities
 ├── utils/                    # Utilities
 │   ├── __init__.py
 │   ├── exceptions.py         # Custom exceptions
@@ -171,6 +174,7 @@ opinion-cli/
 | `QUOTE_TOKENS_CACHE_TTL` | No | 0 | Quote tokens cache TTL in seconds (0 = no caching) |
 | `ENABLE_TRADING_CHECK_INTERVAL` | No | 0 | Trading check interval in seconds (0 = disabled) |
 | `RATE_LIMIT` | No | 12 | API requests per second limit |
+| `TIMEOUT` | No | 30.0 | Request timeout in seconds |
 
 ## Operating Modes
 
@@ -191,8 +195,9 @@ By default, the CLI is configured for real-time monitoring with no caching and r
 - `QUOTE_TOKENS_CACHE_TTL=0` - Quote tokens are fetched fresh every time  
 - `ENABLE_TRADING_CHECK_INTERVAL=0` - No trading check delays
 - `RATE_LIMIT=12` - Maximum 12 API requests per second
+- `TIMEOUT=30.0` - Request timeout of 30 seconds
 
-This ensures you always get the most up-to-date data from the Opinion prediction market while respecting API limits.
+This ensures you always get the most up-to-date data from the Opinion prediction market while respecting API limits and timeouts.
 
 ## Contributing
 

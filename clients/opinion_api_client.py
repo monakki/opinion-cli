@@ -728,7 +728,9 @@ class OpinionOpenAPIClient:
                 )
                 raise OpinionOpenAPIError(f"Unexpected error: {e}") from e
 
-        logger.info(f"Successfully fetched {len(all_positions)} positions total for wallet {wallet_address}")
+        logger.info(
+            f"Successfully fetched {len(all_positions)} positions total for wallet {wallet_address}"
+        )
         return all_positions
 
     def _extract_positions_from_response(self, data: dict | list) -> list[dict]:
@@ -809,14 +811,14 @@ class OpinionOpenAPIClient:
         chain_id: str | None = None,
     ) -> list[Trade]:
         """
-        Get trades of a specific user by wallet address.
+        Get trades of a specific user by wallet address with automatic pagination support.
 
         Only returns filled (successful) trades. Results are sorted by creation time (descending).
 
         Args:
             wallet_address: Target user's wallet address
-            page: Page number (starts from 1)
-            limit: Number of items per page (max 20)
+            page: Starting page number (starts from 1)
+            limit: Maximum number of trades to return (max 1000, will use pagination)
             market_id: Market ID filter (optional)
             chain_id: Chain ID filter (optional)
 
@@ -839,42 +841,76 @@ class OpinionOpenAPIClient:
         if page < 1:
             raise ValueError("page must be >= 1")
 
-        if limit < 1 or limit > 20:
-            raise ValueError("limit must be between 1 and 20")
+        if limit < 1 or limit > 1000:
+            raise ValueError("limit must be between 1 and 1000")
 
-        logger.info(f"Fetching trades for wallet: {wallet_address}")
+        all_trades = []
+        current_page = page
+        remaining_limit = min(
+            limit, APIConstants.MAX_TRADES_TOTAL
+        )  # Cap at max for safety
 
-        params = {
-            "page": page,
-            "limit": limit,
-        }
+        logger.info(
+            f"Fetching up to {remaining_limit} trades for wallet {wallet_address} starting from page {page}"
+        )
 
-        if market_id is not None:
-            params["marketId"] = market_id
+        while remaining_limit > 0:
+            # Calculate how many items to request for this page (max per API call)
+            page_limit = min(remaining_limit, APIConstants.MAX_TRADES_PER_REQUEST)
 
-        if chain_id:
-            params["chainId"] = chain_id
+            params = {
+                "page": current_page,
+                "limit": page_limit,
+            }
 
-        try:
-            endpoint = f"/openapi/trade/user/{wallet_address}"
-            data = await self._make_request("GET", endpoint, params=params)
+            if market_id is not None:
+                params["marketId"] = market_id
 
-            # Extract trades from response
-            trades_data = self._extract_trades_from_response(data)
-            trades = self._parse_trades_data(trades_data)
+            if chain_id:
+                params["chainId"] = chain_id
 
-            logger.info(
-                f"Successfully fetched {len(trades)} trades for wallet {wallet_address}"
-            )
-            return trades
+            logger.info(f"Fetching page {current_page} with {page_limit} items")
 
-        except OpinionOpenAPIError:
-            raise
-        except Exception as e:
-            logger.error(
-                f"Unexpected error fetching trades for wallet {wallet_address}: {e}"
-            )
-            raise OpinionOpenAPIError(f"Unexpected error: {e}") from e
+            try:
+                endpoint = f"/openapi/trade/user/{wallet_address}"
+                data = await self._make_request("GET", endpoint, params=params)
+
+                # Extract trades from response
+                trades_data = self._extract_trades_from_response(data)
+                page_trades = self._parse_trades_data(trades_data)
+
+                if not page_trades:
+                    logger.info("No more trades available, stopping pagination")
+                    break
+
+                all_trades.extend(page_trades)
+                remaining_limit -= len(page_trades)
+
+                # If we got fewer trades than requested, we've reached the end
+                if len(page_trades) < page_limit:
+                    logger.info(
+                        f"Received {len(page_trades)} trades (less than requested {page_limit}), stopping pagination"
+                    )
+                    break
+
+                current_page += 1
+
+                # Add a small delay between requests to be respectful to the API
+                if remaining_limit > 0:
+                    await asyncio.sleep(APIConstants.PAGINATION_DELAY)
+
+            except OpinionOpenAPIError:
+                raise
+            except Exception as e:
+                logger.error(
+                    f"Unexpected error fetching trades page {current_page} for wallet {wallet_address}: {e}"
+                )
+                raise OpinionOpenAPIError(f"Unexpected error: {e}") from e
+
+        logger.info(
+            f"Successfully fetched {len(all_trades)} trades for wallet {wallet_address}"
+        )
+        return all_trades
 
     def _extract_trades_from_response(self, data: dict | list) -> list[dict]:
         """Extract trades data from API response."""

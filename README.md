@@ -107,8 +107,10 @@ uv run help
 Get detailed help for specific commands:
 ```bash
 uv run config --help
-uv run balance --help
 uv run markets --help
+uv run balance --help
+uv run positions --help
+uv run trades --help
 ```
 
 ### Configuration Commands
@@ -117,55 +119,6 @@ Show current configuration and test connection:
 ```bash
 uv run config
 ```
-
-### Balance Commands
-
-Show user's token balances:
-```bash
-# Table format (default) - beautiful Rich tables
-uv run balance
-
-# JSON format
-uv run balance --json
-uv run balance -j
-```
-
-### Positions Commands
-
-Show user's positions (portfolio) for a specific wallet address:
-```bash
-# Show positions for specific wallet (default: 20 positions)
-uv run positions 0x1234567890abcdef1234567890abcdef12345678
-
-# Show positions using environment variable
-WALLET_ADDRESS=0x1234...abcd uv run positions
-
-# Show positions using private key (address will be derived automatically)
-PRIVATE_KEY=0x1234...abcd uv run positions
-
-# Show fewer positions per page
-uv run positions 0x1234...abcd --limit 10
-
-# Show many positions (up to 1000)
-uv run positions 0x1234...abcd --limit 100
-
-# Filter by specific market
-uv run positions 0x1234...abcd --market-id 217
-
-# Navigate through pages
-uv run positions 0x1234...abcd --page 2 --limit 20
-
-# JSON format
-uv run positions 0x1234...abcd --json
-uv run positions 0x1234...abcd -j
-```
-
-**Wallet Address Priority:**
-1. Command argument (highest priority)
-2. Derived from `PRIVATE_KEY` environment variable
-3. `WALLET_ADDRESS` environment variable (lowest priority)
-
-**Note**: Positions command requires only `API_KEY` environment variable.
 
 ### Markets Commands
 
@@ -257,12 +210,107 @@ uv run markets -l 5 -j                       # Top 5 markets as JSON
 | `1` | **Categorical** - Multiple choice markets |
 | `2` | **All** - All market types (default) |
 
+### Balance Commands
+
+Show user's token balances:
+```bash
+# Table format (default) - beautiful Rich tables
+uv run balance
+
+# JSON format
+uv run balance --json
+uv run balance -j
+```
+
+### Positions Commands
+
+Show user's positions (portfolio) for a specific wallet address:
+```bash
+# Show positions for specific wallet (default: 20 positions)
+uv run positions 0x1234567890abcdef1234567890abcdef12345678
+
+# Show positions using environment variable
+WALLET_ADDRESS=0x1234...abcd uv run positions
+
+# Show positions using private key (address will be derived automatically)
+PRIVATE_KEY=0x1234...abcd uv run positions
+
+# Show fewer positions per page
+uv run positions 0x1234...abcd --limit 10
+
+# Show many positions (up to 1000)
+uv run positions 0x1234...abcd --limit 100
+
+# Filter by specific market
+uv run positions 0x1234...abcd --market-id 217
+
+# Navigate through pages
+uv run positions 0x1234...abcd --page 2 --limit 20
+
+# JSON format
+uv run positions 0x1234...abcd --json
+uv run positions 0x1234...abcd -j
+```
+
+**Wallet Address Priority:**
+1. Command argument (highest priority)
+2. Derived from `PRIVATE_KEY` environment variable
+3. `WALLET_ADDRESS` environment variable (lowest priority)
+
+**Note**: Positions command requires only `API_KEY` environment variable.
+
+### Trades Commands
+
+Show user's trade history for a specific wallet address:
+```bash
+# Show trades for specific wallet (default: 20 trades)
+uv run trades 0x1234567890abcdef1234567890abcdef12345678
+
+# Show trades using environment variable
+WALLET_ADDRESS=0x1234...abcd uv run trades
+
+# Show trades using private key (address will be derived automatically)
+PRIVATE_KEY=0x1234...abcd uv run trades
+
+# Show fewer trades per page
+uv run trades 0x1234...abcd --limit 10
+
+# Show many trades (up to 1000, with automatic pagination)
+uv run trades 0x1234...abcd --limit 100
+
+# Filter by specific market
+uv run trades 0x1234...abcd --market-id 217
+
+# Filter by chain ID
+uv run trades 0x1234...abcd --chain-id 56
+
+# Navigate through pages
+uv run trades 0x1234...abcd --page 2 --limit 20
+
+# JSON format
+uv run trades 0x1234...abcd --json
+uv run trades 0x1234...abcd -j
+```
+
+**Features:**
+- **Automatic Pagination**: When requesting more than 20 trades, the command automatically fetches multiple pages
+- **Trade History**: Shows only filled (successful) trades, sorted by creation time (descending)
+- **Market Context**: Displays both market title and root market title for better context
+- **Comprehensive Data**: Shows side (Buy/Sell), outcome, price, shares, amount, and status
+
+**Wallet Address Priority:**
+1. Command argument (highest priority)
+2. Derived from `PRIVATE_KEY` environment variable
+3. `WALLET_ADDRESS` environment variable (lowest priority)
+
+**Note**: Trades command requires only `API_KEY` environment variable.
+
 ## Project Structure
 
 ```
 opinion-cli/
 ├── clients/                   # Opinion API clients and data models
-├── commands/                  # CLI commands (config, balance, positions, markets, help)
+├── commands/                  # CLI commands (config, balance, positions, trades, markets, help)
 ├── config/                    # Configuration management and constants
 ├── display/                   # Display formatting and output (tables, JSON, etc.)
 ├── utils/                     # Utilities (logging, exceptions, wallet helpers)

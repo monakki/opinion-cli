@@ -4,7 +4,6 @@ import asyncio
 import click
 import os
 from typing import Dict, Any, List
-from commands.base import BaseCommand
 from display import JSONDisplayer, PositionsDisplayer
 from config.settings import OpinionConfig
 from clients.opinion_api_client import OpinionOpenAPIError
@@ -27,7 +26,11 @@ def convert_datetime_to_string(data_dict: dict) -> dict:
     return data_dict
 
 
-def display_positions_table(positions: List[Position], wallet_address: str, pagination_info: Dict[str, Any] = None) -> None:
+def display_positions_table(
+    positions: List[Position],
+    wallet_address: str,
+    pagination_info: Dict[str, Any] = None,
+) -> None:
     """Display positions in a formatted table."""
     if not positions:
         console.print(f"📊 No positions found for wallet {wallet_address}")
@@ -37,35 +40,39 @@ def display_positions_table(positions: List[Position], wallet_address: str, pagi
     positions_data = []
     total_current_value = 0.0
     total_unrealized_pnl = 0.0
-    
+
     for position in positions:
         current_value = float(position.current_value_in_quote_token)
         unrealized_pnl = float(position.unrealized_pnl)
-        
+
         total_current_value += current_value
         total_unrealized_pnl += unrealized_pnl
-        
-        positions_data.append({
-            "market_id": position.market_id,
-            "market_title": position.market_title,
-            "root_market_title": position.root_market_title,
-            "outcome": position.outcome,
-            "outcome_side": position.outcome_side_enum,
-            "shares_owned": position.shares_owned,
-            "unrealized_pnl": position.unrealized_pnl,
-            "unrealized_pnl_percent": position.unrealized_pnl_percent,
-            "current_value": position.current_value_in_quote_token,
-            "claim_status": position.claim_status_enum,
-        })
+
+        positions_data.append(
+            {
+                "market_id": position.market_id,
+                "market_title": position.market_title,
+                "root_market_title": position.root_market_title,
+                "outcome": position.outcome,
+                "outcome_side": position.outcome_side_enum,
+                "shares_owned": position.shares_owned,
+                "unrealized_pnl": position.unrealized_pnl,
+                "unrealized_pnl_percent": position.unrealized_pnl_percent,
+                "current_value": position.current_value_in_quote_token,
+                "claim_status": position.claim_status_enum,
+            }
+        )
 
     # Create the table using PositionsDisplayer
-    table = PositionsDisplayer.create_positions_table(positions_data, wallet_address, pagination_info)
+    table = PositionsDisplayer.create_positions_table(
+        positions_data, wallet_address, pagination_info
+    )
     console.print(table)
-    
+
     # Print wallet info and totals
     wallet_short = PositionsDisplayer._format_wallet_address(wallet_address)
     console.print(f"\n📍 Wallet: [cyan]{wallet_short}[/cyan]")
-    
+
     # Format total PnL with color
     if total_unrealized_pnl > 0:
         pnl_color = "green"
@@ -76,24 +83,28 @@ def display_positions_table(positions: List[Position], wallet_address: str, pagi
     else:
         pnl_color = "white"
         pnl_prefix = ""
-    
+
     console.print(f"💰 Total Value: [yellow]${total_current_value:.2f}[/yellow]")
-    console.print(f"📈 Total PnL: [{pnl_color}]{pnl_prefix}${total_unrealized_pnl:.2f}[/{pnl_color}]")
-    
+    console.print(
+        f"📈 Total PnL: [{pnl_color}]{pnl_prefix}${total_unrealized_pnl:.2f}[/{pnl_color}]"
+    )
+
     if pagination_info:
         page = pagination_info.get("page", 1)
         limit = pagination_info.get("limit", 10)
         total = pagination_info.get("total_count", 0)
         if total > limit:
             console.print(f"📄 Page {page} of {(total + limit - 1) // limit}")
-    
+
     console.print(f"\n📊 Total: {len(positions)} positions")
 
 
 @click.command()
 @click.argument("wallet_address", required=False)
 @click.option("--page", "-p", default=1, help="Page number")
-@click.option("--limit", "-l", default=20, help="Number of positions per page (max 1000)")
+@click.option(
+    "--limit", "-l", default=20, help="Number of positions per page (max 1000)"
+)
 @click.option("--market-id", "-m", type=int, help="Filter by market ID")
 @click.option("--chain-id", "-c", help="Filter by chain ID")
 @click.option("--json", "-j", is_flag=True, help="Output positions data in JSON format")
@@ -123,19 +134,21 @@ def positions(
             # Get wallet address from multiple sources
             private_key = os.getenv("PRIVATE_KEY")
             wallet_address_env = os.getenv("WALLET_ADDRESS")
-            
+
             target_wallet = get_wallet_address(
                 wallet_address_arg=wallet_address,
                 private_key_env=private_key,
-                wallet_address_env=wallet_address_env
+                wallet_address_env=wallet_address_env,
             )
-            
+
             if not target_wallet:
                 console.print("❌ Wallet address is required", style="red")
                 console.print("\nProvide wallet address via:")
                 console.print("- Argument: uv run positions 0x1234...abcd")
                 console.print("- Environment: WALLET_ADDRESS=0x1234...abcd")
-                console.print("- Private key: PRIVATE_KEY=0x1234...abcd (address will be derived)")
+                console.print(
+                    "- Private key: PRIVATE_KEY=0x1234...abcd (address will be derived)"
+                )
                 return
 
             # Validate limit
@@ -165,16 +178,18 @@ def positions(
                     positions_data = []
                     total_current_value = 0.0
                     total_unrealized_pnl = 0.0
-                    
+
                     for position in positions_list:
                         position_dict = position.model_dump()
                         position_dict = convert_datetime_to_string(position_dict)
                         positions_data.append(position_dict)
-                        
+
                         # Add to totals
-                        total_current_value += float(position.current_value_in_quote_token)
+                        total_current_value += float(
+                            position.current_value_in_quote_token
+                        )
                         total_unrealized_pnl += float(position.unrealized_pnl)
-                    
+
                     output_data = {
                         "positions": positions_data,
                         "total_count": len(positions_data),
@@ -184,7 +199,7 @@ def positions(
                         "summary": {
                             "total_current_value": round(total_current_value, 2),
                             "total_unrealized_pnl": round(total_unrealized_pnl, 2),
-                        }
+                        },
                     }
                     console.print(JSONDisplayer.to_json_string(output_data))
                     return

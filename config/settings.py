@@ -7,6 +7,7 @@ from .constants import (
     DEFAULT_CHAIN_ID,
     DEFAULT_OPINION_HOST,
     DEFAULT_CACHE_TTL,
+    DEFAULT_RATE_LIMIT,
     DUMMY_PRIVATE_KEY,
     DUMMY_MULTI_SIG_ADDRESS,
     ENV_API_KEY,
@@ -18,6 +19,7 @@ from .constants import (
     ENV_MARKET_CACHE_TTL,
     ENV_QUOTE_TOKENS_CACHE_TTL,
     ENV_ENABLE_TRADING_CHECK_INTERVAL,
+    ENV_RATE_LIMIT,
 )
 
 
@@ -34,6 +36,7 @@ class OpinionConfig:
     market_cache_ttl: int = DEFAULT_CACHE_TTL  # No caching by default
     quote_tokens_cache_ttl: int = DEFAULT_CACHE_TTL  # No caching by default
     enable_trading_check_interval: int = DEFAULT_CACHE_TTL  # No interval by default
+    rate_limit: int = DEFAULT_RATE_LIMIT  # Requests per second
 
     @classmethod
     def from_env(cls) -> "OpinionConfig":
@@ -53,6 +56,7 @@ class OpinionConfig:
         - MARKET_CACHE_TTL: Market cache TTL in seconds (default: 0 - no caching)
         - QUOTE_TOKENS_CACHE_TTL: Quote tokens cache TTL in seconds (default: 0 - no caching)
         - ENABLE_TRADING_CHECK_INTERVAL: Trading check interval in seconds (default: 0 - disabled)
+        - RATE_LIMIT: API requests per second (default: 12)
         """
         # Only API_KEY is required for read-only access
         api_key = os.getenv(ENV_API_KEY)
@@ -77,6 +81,7 @@ class OpinionConfig:
             enable_trading_check_interval=int(
                 os.getenv(ENV_ENABLE_TRADING_CHECK_INTERVAL, DEFAULT_CACHE_TTL)
             ),
+            rate_limit=int(os.getenv(ENV_RATE_LIMIT, DEFAULT_RATE_LIMIT)),
         )
 
     def create_client(self) -> Client:

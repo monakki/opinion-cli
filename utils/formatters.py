@@ -79,7 +79,10 @@ def format_config_info(config_info: Dict[str, Any]) -> str:
         content.append("🟢 Real-time Mode: [green]ENABLED[/green] (No caching)")
         content.append("   ├─ Market Cache TTL: [dim]0s (disabled)[/dim]")
         content.append("   ├─ Quote Tokens Cache TTL: [dim]0s (disabled)[/dim]")
-        content.append("   └─ Trading Check Interval: [dim]0s (disabled)[/dim]")
+        content.append("   ├─ Trading Check Interval: [dim]0s (disabled)[/dim]")
+        content.append(
+            f"   └─ Rate Limit: [cyan]{config_info['rate_limit']} req/s[/cyan]"
+        )
     else:
         content.append("🔵 Cached Mode: [blue]ENABLED[/blue]")
         content.append(
@@ -87,6 +90,12 @@ def format_config_info(config_info: Dict[str, Any]) -> str:
         )
         content.append(
             f"   ├─ Quote Tokens Cache TTL: [cyan]{config_info['quote_tokens_cache_ttl']}s[/cyan]"
+        )
+        content.append(
+            f"   ├─ Trading Check Interval: [cyan]{config_info['enable_trading_check_interval']}s[/cyan]"
+        )
+        content.append(
+            f"   └─ Rate Limit: [cyan]{config_info['rate_limit']} req/s[/cyan]"
         )
         content.append(
             f"   └─ Trading Check Interval: [cyan]{config_info['enable_trading_check_interval']}s[/cyan]"

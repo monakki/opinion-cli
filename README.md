@@ -170,6 +170,7 @@ opinion-cli/
 | `MARKET_CACHE_TTL` | No | 0 | Market cache TTL in seconds (0 = no caching) |
 | `QUOTE_TOKENS_CACHE_TTL` | No | 0 | Quote tokens cache TTL in seconds (0 = no caching) |
 | `ENABLE_TRADING_CHECK_INTERVAL` | No | 0 | Trading check interval in seconds (0 = disabled) |
+| `RATE_LIMIT` | No | 12 | API requests per second limit |
 
 ## Operating Modes
 
@@ -185,12 +186,13 @@ opinion-cli/
 
 ## Real-time Monitoring
 
-By default, the CLI is configured for real-time monitoring with no caching:
+By default, the CLI is configured for real-time monitoring with no caching and rate limiting:
 - `MARKET_CACHE_TTL=0` - Markets are fetched fresh every time
 - `QUOTE_TOKENS_CACHE_TTL=0` - Quote tokens are fetched fresh every time  
 - `ENABLE_TRADING_CHECK_INTERVAL=0` - No trading check delays
+- `RATE_LIMIT=12` - Maximum 12 API requests per second
 
-This ensures you always get the most up-to-date data from the Opinion prediction market.
+This ensures you always get the most up-to-date data from the Opinion prediction market while respecting API limits.
 
 ## Contributing
 

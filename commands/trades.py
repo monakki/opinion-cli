@@ -145,11 +145,11 @@ def trades(
                 all_trades = []
                 current_page = page
                 remaining_limit = limit
-                
+
                 while remaining_limit > 0:
                     # Calculate how many records to fetch on this page (max 100 per API call)
                     page_limit = min(remaining_limit, 100)
-                    
+
                     trades_batch = await client.get_user_trades(
                         wallet_address=target_wallet,
                         page=current_page,
@@ -157,20 +157,20 @@ def trades(
                         market_id=market_id,
                         chain_id=chain_id,
                     )
-                    
+
                     if not trades_batch:
                         # No more trades available
                         break
-                    
+
                     all_trades.extend(trades_batch)
-                    
+
                     # If we got fewer trades than requested, we've reached the end
                     if len(trades_batch) < page_limit:
                         break
-                    
+
                     remaining_limit -= len(trades_batch)
                     current_page += 1
-                
+
                 trades_list = all_trades
 
                 if json:

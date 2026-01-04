@@ -234,3 +234,47 @@ class LoggingConstants:
     DETAILED_FORMAT = "<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan> - <level>{message}</level>"
     SIMPLE_FORMAT = "<level>{level: <8}</level> | <level>{message}</level>"
     MINIMAL_FORMAT = "<level>{message}</level>"
+
+
+# Orders Constants
+class OrdersConstants:
+    """Orders command related constants."""
+
+    # Default limits
+    DEFAULT_OPEN_ORDERS_LIMIT = 1000
+    DEFAULT_OTHER_ORDERS_LIMIT = 20
+    DEFAULT_MANUAL_PAGINATION_LIMIT = 10
+
+    # Status mapping for API (string to numeric)
+    STATUS_MAPPING = {
+        "open": "1",
+        "pending": "1",
+        "filled": "2",
+        "completed": "2",
+        "cancelled": "3",
+        "canceled": "3",
+    }
+
+    # Side mapping for display
+    SIDE_BUY = "1"
+    SIDE_SELL = "0"
+
+    # Pagination settings
+    ORDERS_PER_PAGE_API = 20  # API returns max 20 orders per page
+    PAGINATION_DELAY = 0.1  # Delay between API requests in seconds
+
+    # Display formatting
+    ORDER_ID_MAX_LENGTH = 12
+    ORDER_ID_TRUNCATE_LENGTH = 9
+    MARKET_TITLE_MAX_LENGTH = 25
+    MARKET_TITLE_TRUNCATE_LENGTH = 22
+    OUTCOME_MAX_LENGTH = 8
+    OUTCOME_TRUNCATE_LENGTH = 5
+    PRICE_PRECISION = 3
+    SIZE_PRECISION = 2
+    DATE_TRUNCATE_LENGTH = 10
+
+    # Wallet address formatting
+    WALLET_ADDRESS_MIN_LENGTH = 10
+    WALLET_ADDRESS_PREFIX_LENGTH = 6
+    WALLET_ADDRESS_SUFFIX_LENGTH = 4

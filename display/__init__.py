@@ -22,6 +22,7 @@ from .config_display import ConfigDisplayer
 from .balance_display import BalanceDisplayer
 from .positions_display import PositionsDisplayer
 from .trades_display import TradesDisplayer
+from .orders_display import OrdersDisplayer
 
 __all__ = [
     "MarketDisplayer",
@@ -30,6 +31,7 @@ __all__ = [
     "BalanceDisplayer",
     "PositionsDisplayer",
     "TradesDisplayer",
+    "OrdersDisplayer",
     "format_color_text",
     "format_currency",
     "format_date",

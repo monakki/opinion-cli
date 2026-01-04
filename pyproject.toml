@@ -35,6 +35,7 @@ config = "cli:main"
 balance = "cli:main"
 positions = "cli:main"
 trades = "cli:main"
+orders = "cli:main"
 help = "cli:main"
 markets = "cli:main"
 

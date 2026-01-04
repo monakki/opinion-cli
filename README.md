@@ -110,6 +110,7 @@ uv run config --help
 uv run markets --help
 uv run balance --help
 uv run positions --help
+uv run orders --help
 uv run trades --help
 ```
 
@@ -258,6 +259,61 @@ uv run positions 0x1234...abcd -j
 3. `WALLET_ADDRESS` environment variable (lowest priority)
 
 **Note**: Positions command requires only `API_KEY` environment variable.
+
+### Orders Commands
+
+Show user's orders with optional filters:
+```bash
+# Show ALL open orders (auto-paginated, up to 1000)
+uv run orders
+
+# Show all orders (auto-paginated, up to 20)
+uv run orders --status all
+
+# Show filled orders (auto-paginated, up to 20)
+uv run orders --status filled
+
+# Show cancelled orders (auto-paginated, up to 20)
+uv run orders --status cancelled
+
+# Show ALL open orders for specific market
+uv run orders --market-id 217
+
+# Limit maximum orders shown
+uv run orders --limit 50
+
+# Disable auto-pagination (use manual pagination)
+uv run orders --no-auto-paginate
+
+# Manual pagination (when auto-pagination is disabled)
+uv run orders --no-auto-paginate --page 2 --limit 10
+
+# JSON format
+uv run orders --json
+uv run orders -j
+```
+
+**Filter Options:**
+- `--market-id` / `-m`: Filter by market ID (0 = all markets)
+- `--status` / `-s`: Filter by status (open, pending, filled, completed, cancelled, canceled, all)
+- `--limit` / `-l`: Maximum number of orders (default: 1000 for open orders, 20 for others)
+- `--page` / `-p`: Page number (only used with --no-auto-paginate)
+- `--no-auto-paginate`: Disable automatic pagination (use manual pagination)
+- `--json` / `-j`: Output in JSON format
+
+**Status Values:**
+- `open` or `pending`: Active orders waiting to be filled (default, auto-paginated up to 1000)
+- `filled` or `completed`: Successfully executed orders (auto-paginated up to 20)
+- `cancelled` or `canceled`: Cancelled orders (auto-paginated up to 20)
+- `all`: Show all orders regardless of status (auto-paginated up to 20)
+
+**Auto-Pagination:**
+- Automatically fetches multiple pages to show all orders up to the limit
+- Open orders: default limit 1000 (to show all active orders)
+- Other statuses: default limit 20 (for better performance)
+- Use `--no-auto-paginate` to disable and use manual pagination instead
+
+**Note**: Orders command requires both `API_KEY` and `PRIVATE_KEY` environment variables.
 
 ### Trades Commands
 

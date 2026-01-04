@@ -5,7 +5,7 @@ from typing import Dict, Optional, Any
 from aiolimiter import AsyncLimiter
 from opinion_clob_sdk import Client
 from config.settings import OpinionConfig
-from config.constants import DUMMY_PRIVATE_KEY
+from config.constants import DUMMY_PRIVATE_KEY, OrdersConstants
 
 
 class OpinionClobClientWrapper:
@@ -99,6 +99,97 @@ class OpinionClobClientWrapper:
     def get_balances(self) -> Any:
         """Get user's token balances with rate limiting."""
         return self._sync_rate_limited_call(self.client.get_my_balances)
+
+    def get_my_orders(
+        self,
+        market_id: int = 0,
+        status: str = "",
+        limit: int = OrdersConstants.DEFAULT_MANUAL_PAGINATION_LIMIT,
+        page: int = 1,
+        auto_paginate: bool = False,
+    ) -> Any:
+        """Get user's orders with optional filters and rate limiting.
+
+        Args:
+            market_id: Filter by market (0 = all markets)
+            status: Filter by status (e.g., "open", "filled", "cancelled")
+            limit: Items per page (or max items if auto_paginate=True)
+            page: Page number (ignored if auto_paginate=True)
+            auto_paginate: If True, automatically fetch all pages up to limit
+
+        Returns:
+            API response with result.list containing orders
+        """
+        if auto_paginate:
+            return self._get_all_orders_paginated(market_id, status, limit)
+        else:
+            return self._sync_rate_limited_call(
+                self.client.get_my_orders,
+                market_id=market_id,
+                status=status,
+                limit=limit,
+                page=page,
+            )
+
+    def _get_all_orders_paginated(
+        self, market_id: int, status: str, max_limit: int
+    ) -> Any:
+        """Fetch all orders using automatic pagination."""
+        all_orders = []
+        page = 1
+        per_page = (
+            OrdersConstants.ORDERS_PER_PAGE_API
+        )  # API returns max 20 orders per page
+
+        while len(all_orders) < max_limit:
+            response = self._sync_rate_limited_call(
+                self.client.get_my_orders,
+                market_id=market_id,
+                status=status,
+                limit=per_page,
+                page=page,
+            )
+
+            # Extract orders from response
+            if hasattr(response, "result") and hasattr(response.result, "list"):
+                orders = response.result.list
+                if not orders:
+                    break  # No more orders
+
+                all_orders.extend(orders)
+
+                # If we got fewer orders than requested, we've reached the end
+                if len(orders) < per_page:
+                    break
+
+                page += 1
+
+                # Add small delay between requests
+                import time
+
+                time.sleep(OrdersConstants.PAGINATION_DELAY)
+            else:
+                break
+
+        # Limit to max_limit
+        if len(all_orders) > max_limit:
+            all_orders = all_orders[:max_limit]
+
+        # Create a response-like object
+        class PaginatedResponse:
+            def __init__(self, orders_list, total_count):
+                self.errno = 0
+                self.errmsg = ""
+                self.result = PaginatedResult(orders_list, total_count)
+
+        class PaginatedResult:
+            def __init__(self, orders_list, total_count):
+                self.list = orders_list
+                self.total = total_count
+                self.page = 1
+                self.limit = len(orders_list)
+
+        return PaginatedResponse(all_orders, len(all_orders))
 
     @classmethod
     def from_env(cls) -> "OpinionClobClientWrapper":

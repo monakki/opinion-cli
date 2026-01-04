@@ -130,6 +130,43 @@ uv run balance --json
 uv run balance -j
 ```
 
+### Positions Commands
+
+Show user's positions (portfolio) for a specific wallet address:
+```bash
+# Show positions for specific wallet (default: 20 positions)
+uv run positions 0x1234567890abcdef1234567890abcdef12345678
+
+# Show positions using environment variable
+WALLET_ADDRESS=0x1234...abcd uv run positions
+
+# Show positions using private key (address will be derived automatically)
+PRIVATE_KEY=0x1234...abcd uv run positions
+
+# Show fewer positions per page
+uv run positions 0x1234...abcd --limit 10
+
+# Show many positions (up to 1000)
+uv run positions 0x1234...abcd --limit 100
+
+# Filter by specific market
+uv run positions 0x1234...abcd --market-id 217
+
+# Navigate through pages
+uv run positions 0x1234...abcd --page 2 --limit 20
+
+# JSON format
+uv run positions 0x1234...abcd --json
+uv run positions 0x1234...abcd -j
+```
+
+**Wallet Address Priority:**
+1. Command argument (highest priority)
+2. Derived from `PRIVATE_KEY` environment variable
+3. `WALLET_ADDRESS` environment variable (lowest priority)
+
+**Note**: Positions command requires only `API_KEY` environment variable.
+
 ### Markets Commands
 
 Fetch and display markets from Opinion Open API. Supports both numeric market IDs and Opinion Trade URLs from https://app.opinion.trade.
@@ -224,40 +261,15 @@ uv run markets -l 5 -j                       # Top 5 markets as JSON
 
 ```
 opinion-cli/
-├── clients/                   # Opinion API clients
-│   ├── __init__.py
-│   ├── models.py             # Pydantic data models
-│   ├── opinion_api_client.py # Open API client (async)
-│   └── opinion_clob_client.py # CLOB SDK client wrapper
-├── commands/                  # CLI commands
-│   ├── __init__.py
-│   ├── base.py               # Base command functionality
-│   ├── config.py             # Configuration commands
-│   ├── balance.py            # Balance commands
-│   └── help.py               # Help commands
-├── config/                   # Configuration management
-│   ├── __init__.py
-│   ├── constants.py          # All constants and enums
-│   ├── settings.py           # Unified OpinionConfig class
-│   └── validators.py         # Input validation utilities
-├── display/                  # Display and formatting
-│   ├── __init__.py
-│   ├── formatters.py         # Pure formatting functions
-│   ├── json_display.py       # JSON output formatting
-│   ├── table_display.py      # Table display functionality
-│   ├── market_display.py     # Market-specific display
-│   ├── config_display.py     # Configuration display
-│   └── balance_display.py    # Balance display
-├── utils/                    # Utilities
-│   ├── __init__.py
-│   ├── exceptions.py         # Custom exceptions
-│   └── logging.py            # Logging configuration
-├── cli.py                    # CLI entry point
-├── .env.example              # Environment variables template
-└── pyproject.toml            # Project configuration
+├── clients/                   # Opinion API clients and data models
+├── commands/                  # CLI commands (config, balance, positions, markets, help)
+├── config/                    # Configuration management and constants
+├── display/                   # Display formatting and output (tables, JSON, etc.)
+├── utils/                     # Utilities (logging, exceptions, wallet helpers)
+├── cli.py                     # CLI entry point and command routing
+├── .env.example               # Environment variables template
+└── pyproject.toml             # Project configuration and dependencies
 ```
-
-## Environment Variables
 
 ## Environment Variables
 
@@ -267,6 +279,7 @@ opinion-cli/
 | `RPC_URL` | Trading only | - | Blockchain RPC URL |
 | `PRIVATE_KEY` | Trading only | - | Private key for transactions |
 | `MULTI_SIG_ADDRESS` | Trading only | - | Multi-signature wallet address |
+| `WALLET_ADDRESS` | No | - | Default wallet address for positions command |
 | `CHAIN_ID` | No | 56 | Blockchain chain ID |
 | `OPINION_HOST` | No | https://proxy.opinion.trade:8443 | Opinion API host |
 | `MARKET_CACHE_TTL` | No | 0 | Market cache TTL in seconds (0 = no caching) |
@@ -280,7 +293,7 @@ opinion-cli/
 
 ### Read-Only Mode
 - **Requirements**: Only `API_KEY`
-- **Capabilities**: View markets, orders, and positions
+- **Capabilities**: View markets, orders, positions, and user portfolios
 - **Use case**: Monitoring and analysis without trading
 
 ### Full Access Mode  

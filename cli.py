@@ -5,6 +5,7 @@ import sys
 from dotenv import load_dotenv
 from commands.config import config
 from commands.balance import balance
+from commands.positions import positions
 from commands.help import help
 from commands.markets import markets
 
@@ -23,6 +24,7 @@ def main():
     COMMANDS = {
         "config": config,
         "balance": balance,
+        "positions": positions,
         "help": help,
         "markets": markets,
     }

@@ -68,6 +68,8 @@ class APIConstants:
     DEFAULT_TIMEOUT = DEFAULT_TIMEOUT
     MAX_MARKETS_PER_REQUEST = 20
     MAX_MARKETS_TOTAL = 1000
+    MAX_POSITIONS_PER_REQUEST = 20
+    MAX_POSITIONS_TOTAL = 1000
     PAGINATION_DELAY = 0.1
     USER_AGENT = "opinion-cli/0.1.0"
 
@@ -141,6 +143,7 @@ class ErrorMessages:
     API_HEALTH_FAILED = "API health check failed"
     REQUEST_TIMEOUT = "Request timeout"
     RATE_LIMIT_EXCEEDED = "Rate limit exceeded. Retry after {retry_after} seconds"
+    WALLET_ADDRESS_REQUIRED = "Wallet address is required. Provide it as argument or set WALLET_ADDRESS environment variable."
 
 
 # Success Messages

@@ -632,14 +632,14 @@ class OpinionOpenAPIClient:
         chain_id: str | None = None,
     ) -> list[Position]:
         """
-        Get positions (portfolio) of a specific user by wallet address.
+        Get positions (portfolio) of a specific user by wallet address with automatic pagination support.
 
         Results are sorted by position size (descending).
 
         Args:
             wallet_address: Target user's wallet address
-            page: Page number (starts from 1)
-            limit: Number of items per page (max 20)
+            page: Starting page number (starts from 1)
+            limit: Maximum number of positions to return (max 1000, will use pagination)
             market_id: Market ID filter (optional)
             chain_id: Chain ID filter (optional)
 
@@ -662,42 +662,74 @@ class OpinionOpenAPIClient:
         if page < 1:
             raise ValueError("page must be >= 1")
 
-        if limit < 1 or limit > 20:
-            raise ValueError("limit must be between 1 and 20")
+        if limit < 1:
+            raise ValueError("limit must be >= 1")
 
-        logger.info(f"Fetching positions for wallet: {wallet_address}")
+        all_positions = []
+        current_page = page
+        remaining_limit = min(
+            limit, APIConstants.MAX_POSITIONS_TOTAL
+        )  # Cap at max for safety
 
-        params = {
-            "page": page,
-            "limit": limit,
-        }
+        logger.info(
+            f"Fetching up to {remaining_limit} positions for wallet {wallet_address} starting from page {page}"
+        )
 
-        if market_id is not None:
-            params["marketId"] = market_id
+        while remaining_limit > 0:
+            # Calculate how many items to request for this page (max per API call)
+            page_limit = min(remaining_limit, APIConstants.MAX_POSITIONS_PER_REQUEST)
 
-        if chain_id:
-            params["chainId"] = chain_id
+            params = {
+                "page": current_page,
+                "limit": page_limit,
+            }
 
-        try:
-            endpoint = f"/openapi/positions/user/{wallet_address}"
-            data = await self._make_request("GET", endpoint, params=params)
+            if market_id is not None:
+                params["marketId"] = market_id
 
-            # Extract positions from response
-            positions_data = self._extract_positions_from_response(data)
-            positions = self._parse_positions_data(positions_data)
+            if chain_id:
+                params["chainId"] = chain_id
 
-            logger.info(
-                f"Successfully fetched {len(positions)} positions for wallet {wallet_address}"
-            )
-            return positions
+            logger.info(f"Fetching page {current_page} with {page_limit} items")
 
-        except OpinionOpenAPIError:
-            raise
-        except Exception as e:
-            logger.error(
-                f"Unexpected error fetching positions for wallet {wallet_address}: {e}"
-            )
-            raise OpinionOpenAPIError(f"Unexpected error: {e}") from e
+            try:
+                endpoint = f"/openapi/positions/user/{wallet_address}"
+                data = await self._make_request("GET", endpoint, params=params)
+
+                # Extract positions from response
+                positions_data = self._extract_positions_from_response(data)
+                page_positions = self._parse_positions_data(positions_data)
+
+                if not page_positions:
+                    logger.info("No more positions available, stopping pagination")
+                    break
+
+                all_positions.extend(page_positions)
+                remaining_limit -= len(page_positions)
+
+                # If we got fewer positions than requested, we've reached the end
+                if len(page_positions) < page_limit:
+                    logger.info(
+                        f"Received {len(page_positions)} positions (less than requested {page_limit}), stopping pagination"
+                    )
+                    break
+
+                current_page += 1
+
+                # Add a small delay between requests to be respectful to the API
+                if remaining_limit > 0:
+                    await asyncio.sleep(APIConstants.PAGINATION_DELAY)
+
+            except OpinionOpenAPIError:
+                raise
+            except Exception as e:
+                logger.error(
+                    f"Unexpected error fetching positions page {current_page} for wallet {wallet_address}: {e}"
+                )
+                raise OpinionOpenAPIError(f"Unexpected error: {e}") from e
+
+        logger.info(f"Successfully fetched {len(all_positions)} positions total for wallet {wallet_address}")
+        return all_positions
 
     def _extract_positions_from_response(self, data: dict | list) -> list[dict]:
         """Extract positions data from API response."""

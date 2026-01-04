@@ -33,6 +33,7 @@ dependencies = [
 [project.scripts]
 config = "cli:main"
 balance = "cli:main"
+positions = "cli:main"
 help = "cli:main"
 markets = "cli:main"
 

@@ -20,12 +20,14 @@ from .json_display import JSONDisplayer
 from .market_display import MarketDisplayer
 from .config_display import ConfigDisplayer
 from .balance_display import BalanceDisplayer
+from .positions_display import PositionsDisplayer
 
 __all__ = [
     "MarketDisplayer",
     "JSONDisplayer",
     "ConfigDisplayer",
     "BalanceDisplayer",
+    "PositionsDisplayer",
     "format_color_text",
     "format_currency",
     "format_date",

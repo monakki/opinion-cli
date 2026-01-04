@@ -7,6 +7,7 @@ from .exceptions import (
     AuthenticationError,
 )
 from .logging import setup_logging, disable_logging, enable_logging
+from .wallet import get_wallet_address, get_wallet_address_from_private_key
 
 __all__ = [
     "OpinionCliError",
@@ -16,4 +17,6 @@ __all__ = [
     "setup_logging",
     "disable_logging",
     "enable_logging",
+    "get_wallet_address",
+    "get_wallet_address_from_private_key",
 ]

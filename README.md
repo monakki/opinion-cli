@@ -1,0 +1,204 @@
+# Opinion CLI
+
+Command line interface for Opinion prediction market.
+
+[![GitHub Repository](https://img.shields.io/badge/GitHub-monakki%2Fopinion--cli-blue?logo=github)](https://github.com/monakki/opinion-cli)
+[![Python](https://img.shields.io/badge/Python-3.14+-blue?logo=python)](https://python.org)
+[![uv](https://img.shields.io/badge/uv-package%20manager-orange?logo=python)](https://docs.astral.sh/uv/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![Support](https://img.shields.io/badge/Support-BSC%2FEVM-yellow?logo=binance)](https://github.com/monakki/opinion-cli#support-the-project)
+
+## Prerequisites
+
+This project uses [uv](https://docs.astral.sh/uv/) - a fast Python package manager and project manager written in Rust.
+
+### Install uv
+
+**macOS and Linux:**
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+**Windows:**
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+For more installation options, see the [official uv installation guide](https://docs.astral.sh/uv/getting-started/installation/).
+
+## Installation
+
+### Option 1: Clone via HTTPS
+```bash
+# Clone the repository
+git clone https://github.com/monakki/opinion-cli.git
+cd opinion-cli
+
+# Install dependencies and create virtual environment
+uv sync
+```
+
+### Option 2: Clone via SSH
+```bash
+# Clone the repository
+git clone git@github.com:monakki/opinion-cli.git
+cd opinion-cli
+
+# Install dependencies and create virtual environment
+uv sync
+```
+
+> **Note**: `uv sync` will automatically:
+> - Create a virtual environment if it doesn't exist
+> - Install all project dependencies
+> - Install the project in editable mode
+> - Make CLI commands available via `uv run`
+
+## Configuration
+
+The CLI supports two modes of operation:
+
+### 1. Read-Only Mode (Minimal Configuration)
+For viewing markets, orders, and positions only:
+
+```bash
+# Create .env file with minimal configuration
+echo "API_KEY=your_actual_api_key" > .env
+```
+
+### 2. Full Access Mode (Complete Configuration)
+For viewing and placing orders/trades:
+
+1. Copy the example environment file:
+```bash
+cp .env.example .env
+```
+
+2. Edit `.env` file with your actual credentials:
+```bash
+# Required: Opinion API key
+API_KEY=your_actual_api_key
+
+# Required for trading: Blockchain RPC URL
+RPC_URL=https://bsc-dataseed.binance.org/
+
+# Required for trading: Your private key for transactions
+PRIVATE_KEY=your_actual_private_key
+
+# Required for trading: Multi-signature wallet address
+MULTI_SIG_ADDRESS=your_actual_multisig_address
+```
+
+**Where to get credentials:**
+- **API_KEY**: Follow the [Opinion Developer Guide](https://docs.opinion.trade/developer-guide/opinion-clob-sdk/getting-started/quick-start#prerequisites)
+- **MULTI_SIG_ADDRESS**: Check your Opinion platform "My Profile" section
+- **PRIVATE_KEY**: Your wallet's private key (keep this secure!)
+- **RPC_URL**: BSC RPC endpoint (example: `https://bsc-dataseed.binance.org/`)
+
+## Usage
+
+### Configuration Commands
+
+Show current configuration and test connection:
+```bash
+uv run config
+```
+
+### Available Commands
+
+```bash
+# Show help for main CLI
+uv run opinion-cli --help
+
+# Show configuration and test connection
+uv run config
+```
+
+## Project Structure
+
+```
+opinion-cli/
+├── client/                 # Opinion client wrapper
+│   ├── __init__.py
+│   └── opinion_client.py
+├── commands/              # CLI commands
+│   ├── __init__.py
+│   └── config.py         # Configuration commands
+├── config/               # Configuration management
+│   ├── __init__.py
+│   └── settings.py       # Settings and OpinionConfig class
+├── utils/                # Utilities
+│   ├── __init__.py
+│   └── formatters.py     # Output formatting
+├── main.py              # CLI entry point
+├── .env.example         # Environment variables template
+└── pyproject.toml       # Project configuration
+```
+
+## Environment Variables
+
+## Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `API_KEY` | Yes | - | Opinion API key (required for all operations) |
+| `RPC_URL` | Trading only | - | Blockchain RPC URL |
+| `PRIVATE_KEY` | Trading only | - | Private key for transactions |
+| `MULTI_SIG_ADDRESS` | Trading only | - | Multi-signature wallet address |
+| `CHAIN_ID` | No | 56 | Blockchain chain ID |
+| `OPINION_HOST` | No | https://proxy.opinion.trade:8443 | Opinion API host |
+| `MARKET_CACHE_TTL` | No | 0 | Market cache TTL in seconds (0 = no caching) |
+| `QUOTE_TOKENS_CACHE_TTL` | No | 0 | Quote tokens cache TTL in seconds (0 = no caching) |
+| `ENABLE_TRADING_CHECK_INTERVAL` | No | 0 | Trading check interval in seconds (0 = disabled) |
+
+## Operating Modes
+
+### Read-Only Mode
+- **Requirements**: Only `API_KEY`
+- **Capabilities**: View markets, orders, and positions
+- **Use case**: Monitoring and analysis without trading
+
+### Full Access Mode  
+- **Requirements**: `API_KEY`, `RPC_URL`, `PRIVATE_KEY`, `MULTI_SIG_ADDRESS`
+- **Capabilities**: All read-only features plus placing orders and trades
+- **Use case**: Complete trading functionality
+
+## Real-time Monitoring
+
+By default, the CLI is configured for real-time monitoring with no caching:
+- `MARKET_CACHE_TTL=0` - Markets are fetched fresh every time
+- `QUOTE_TOKENS_CACHE_TTL=0` - Quote tokens are fetched fresh every time  
+- `ENABLE_TRADING_CHECK_INTERVAL=0` - No trading check delays
+
+This ensures you always get the most up-to-date data from the Opinion prediction market.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## Support the Project
+
+If you find this project helpful, you can support the development:
+
+**Crypto donations (BSC/EVM):**
+```
+0xdf8f5610481065c071154b17460d459455325fd1
+```
+
+*Donations help maintain and improve the project. Thank you for your support!*
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Repository
+
+- **GitHub**: [https://github.com/monakki/opinion-cli](https://github.com/monakki/opinion-cli)
+- **Issues**: [https://github.com/monakki/opinion-cli/issues](https://github.com/monakki/opinion-cli/issues)
+- **Pull Requests**: [https://github.com/monakki/opinion-cli/pulls](https://github.com/monakki/opinion-cli/pulls)

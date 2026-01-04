@@ -1,0 +1,40 @@
+[project]
+name = "opinion-cli"
+version = "0.1.0"
+description = "Command line interface for Opinion prediction market"
+readme = "README.md"
+requires-python = ">=3.14"
+authors = [
+    {name = "monakki"},
+]
+license = {text = "MIT"}
+homepage = "https://github.com/monakki/opinion-cli"
+repository = "https://github.com/monakki/opinion-cli"
+keywords = ["opinion", "prediction", "market", "cli", "trading"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+   "click>=8.3.1",
+   "opinion-clob-sdk>=0.4.3",
+   "python-dotenv>=1.2.1",
+   "ruff>=0.14.10",
+]
+
+[project.scripts]
+opinion-cli = "main:main"
+config = "config_cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+package = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["client", "commands", "config", "utils"]

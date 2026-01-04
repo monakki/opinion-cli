@@ -2,7 +2,7 @@
 
 import click
 from commands.base import BaseCommand
-from utils.formatters import format_config_info, format_connection_test
+from display import ConfigDisplayer
 from config.constants import SEPARATOR_LENGTH
 
 
@@ -14,10 +14,10 @@ def config():
     config_info = client.get_config_info()
 
     # Show configuration
-    click.echo(format_config_info(config_info))
+    click.echo(ConfigDisplayer.format_config_info(config_info))
 
     # Test connection
     click.echo("\n" + "=" * SEPARATOR_LENGTH)
     click.echo("🔗 Connection Test:")
     result = client.test_connection()
-    click.echo(format_connection_test(result))
+    click.echo(ConfigDisplayer.format_connection_test(result))

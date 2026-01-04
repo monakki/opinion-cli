@@ -3,7 +3,7 @@
 import click
 from typing import Dict, Any
 from commands.base import BaseCommand
-from utils.formatters import format_json, format_balance_table
+from display import JSONDisplayer, BalanceDisplayer
 
 
 class BalanceParser:
@@ -62,7 +62,7 @@ def balance(json: bool):
         parsed_data = BalanceParser.parse_balance_response(response)
 
         if json:
-            click.echo(format_json(parsed_data))
+            click.echo(JSONDisplayer.to_json_string(parsed_data))
             return
 
         # Handle table format
@@ -75,7 +75,9 @@ def balance(json: bool):
                     "multi_sign_address": parsed_data["result"]["multi_sign_address"],
                 }
 
-                formatted_output = format_balance_table(balances, wallet_info)
+                formatted_output = BalanceDisplayer.format_balance_table(
+                    balances, wallet_info
+                )
                 click.echo(formatted_output)
             else:
                 click.echo("📊 No balances found")

@@ -26,6 +26,7 @@ def help():
 
     table.add_row("config", "Show current configuration and test connection")
     table.add_row("balance", "Show user's token balances")
+    table.add_row("markets", "Fetch and display markets from Opinion Open API")
     table.add_row("help", "Show this help message")
 
     # Display help

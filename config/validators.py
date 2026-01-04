@@ -2,6 +2,7 @@
 
 import re
 from typing import Any
+from urllib.parse import urlparse, parse_qs
 
 from .constants import (
     DefaultValues,
@@ -34,6 +35,59 @@ class InputValidator:
             return int(market_id) > 0
         except ValueError:
             return False
+
+    @staticmethod
+    def extract_market_id_from_url(url: str) -> str | None:
+        """Extract topicId from Opinion Trade URL.
+
+        Supports URLs like:
+        - https://app.opinion.trade/detail?topicId=61&type=multi
+        - https://app.opinion.trade/detail?topicId=217
+        """
+        if not url or not isinstance(url, str):
+            return None
+
+        try:
+            # Parse the URL
+            parsed = urlparse(url.strip())
+
+            # Check if it's an opinion.trade URL
+            if "opinion.trade" not in parsed.netloc:
+                return None
+
+            # Extract query parameters
+            query_params = parse_qs(parsed.query)
+
+            # Get topicId from query parameters
+            topic_ids = query_params.get("topicId", [])
+            if not topic_ids:
+                return None
+
+            topic_id = topic_ids[0].strip()
+
+            # Validate the extracted ID
+            if InputValidator.validate_market_id(topic_id):
+                return topic_id
+
+            return None
+
+        except Exception:
+            return None
+
+    @staticmethod
+    def is_opinion_trade_url(input_str: str) -> bool:
+        """Check if input string is an Opinion Trade URL."""
+        if not input_str or not isinstance(input_str, str):
+            return False
+
+        input_str = input_str.strip()
+
+        # Simple check for URL pattern
+        return (
+            input_str.startswith(("http://", "https://"))
+            and "opinion.trade" in input_str
+            and "topicId=" in input_str
+        )
 
     @staticmethod
     def validate_api_key(api_key: str) -> tuple[bool, str | None]:

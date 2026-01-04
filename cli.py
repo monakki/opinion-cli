@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from commands.config import config
 from commands.balance import balance
 from commands.help import help
+from commands.markets import markets
 
 # Load environment variables from .env file
 load_dotenv()
@@ -23,6 +24,7 @@ def main():
         "config": config,
         "balance": balance,
         "help": help,
+        "markets": markets,
     }
 
     if script_name in COMMANDS:

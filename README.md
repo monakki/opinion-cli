@@ -108,6 +108,7 @@ Get detailed help for specific commands:
 ```bash
 uv run config --help
 uv run balance --help
+uv run markets --help
 ```
 
 ### Configuration Commands
@@ -129,6 +130,96 @@ uv run balance --json
 uv run balance -j
 ```
 
+### Markets Commands
+
+Fetch and display markets from Opinion Open API. Supports both numeric market IDs and Opinion Trade URLs from https://app.opinion.trade.
+
+#### Basic Usage
+
+```bash
+# Show top 20 markets (default, sorted by 24h volume desc)
+uv run markets
+
+# Show specific market by ID
+uv run markets 217
+
+# Show market from Opinion Trade URL
+uv run markets https://app.opinion.trade/detail?topicId=217
+uv run markets "https://app.opinion.trade/detail?topicId=61&type=multi"
+```
+
+#### Filtering and Sorting
+
+```bash
+# Show different number of markets
+uv run markets -l 10                         # or --limit 10
+uv run markets --limit 50
+
+# Filter by market status
+uv run markets -s activated                  # or --status activated
+uv run markets --status resolved
+
+# Filter by market type
+uv run markets -t 0                          # or --market-type 0 (Binary)
+uv run markets --market-type 1               # Categorical markets
+uv run markets -t 2                          # All market types (default)
+
+# Sort markets (--sort-by options)
+uv run markets --sort-by 1                   # Sort by newest first
+uv run markets --sort-by 2                   # Sort by ending soon
+uv run markets --sort-by 3                   # Sort by total volume (desc)
+uv run markets --sort-by 5                   # Sort by 24h volume (desc) - default
+uv run markets --sort-by 7                   # Sort by 7d volume (desc)
+```
+
+#### Combined Filters
+
+```bash
+# Top 5 binary markets by total volume
+uv run markets -t 0 --sort-by 3 -l 5
+uv run markets --market-type 0 --sort-by 3 --limit 5
+
+# Resolved categorical markets, newest first
+uv run markets -s resolved -t 1 --sort-by 1
+
+# Active markets ending soon, show 15
+uv run markets --status activated --sort-by 2 --limit 15
+```
+
+#### Pagination and Output
+
+```bash
+# Navigate through pages
+uv run markets -p 1 -l 20                    # or --page 1 --limit 20
+uv run markets --page 2 --limit 20
+
+# JSON output for programmatic use
+uv run markets -j                            # or --json
+uv run markets 217 --json                    # Specific market as JSON
+uv run markets -l 5 -j                       # Top 5 markets as JSON
+```
+
+#### Sort Options Reference
+
+| Option | Description |
+|--------|-------------|
+| `1` | **new** - Newest markets first |
+| `2` | **ending_soon** - Markets ending soonest first |
+| `3` | **volume_desc** - Highest total volume first |
+| `4` | **volume_asc** - Lowest total volume first |
+| `5` | **volume_24h_desc** - Highest 24h volume first (default) |
+| `6` | **volume_24h_asc** - Lowest 24h volume first |
+| `7` | **volume_7d_desc** - Highest 7d volume first |
+| `8` | **volume_7d_asc** - Lowest 7d volume first |
+
+#### Market Type Options
+
+| Option | Description |
+|--------|-------------|
+| `0` | **Binary** - Yes/No prediction markets |
+| `1` | **Categorical** - Multiple choice markets |
+| `2` | **All** - All market types (default) |
+
 ## Project Structure
 
 ```
@@ -149,10 +240,18 @@ opinion-cli/
 │   ├── constants.py          # All constants and enums
 │   ├── settings.py           # Unified OpinionConfig class
 │   └── validators.py         # Input validation utilities
+├── display/                  # Display and formatting
+│   ├── __init__.py
+│   ├── formatters.py         # Pure formatting functions
+│   ├── json_display.py       # JSON output formatting
+│   ├── table_display.py      # Table display functionality
+│   ├── market_display.py     # Market-specific display
+│   ├── config_display.py     # Configuration display
+│   └── balance_display.py    # Balance display
 ├── utils/                    # Utilities
 │   ├── __init__.py
 │   ├── exceptions.py         # Custom exceptions
-│   └── formatters.py         # Output formatting
+│   └── logging.py            # Logging configuration
 ├── cli.py                    # CLI entry point
 ├── .env.example              # Environment variables template
 └── pyproject.toml            # Project configuration
@@ -175,6 +274,7 @@ opinion-cli/
 | `ENABLE_TRADING_CHECK_INTERVAL` | No | 0 | Trading check interval in seconds (0 = disabled) |
 | `RATE_LIMIT` | No | 12 | API requests per second limit |
 | `TIMEOUT` | No | 30.0 | Request timeout in seconds |
+| `LOG_LEVEL` | No | - | Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL) - disabled if not set |
 
 ## Operating Modes
 
@@ -196,6 +296,10 @@ By default, the CLI is configured for real-time monitoring with no caching and r
 - `ENABLE_TRADING_CHECK_INTERVAL=0` - No trading check delays
 - `RATE_LIMIT=12` - Maximum 12 API requests per second
 - `TIMEOUT=30.0` - Request timeout of 30 seconds
+
+By default, logging is disabled for clean output. Enable logging by setting `LOG_LEVEL`:
+- `LOG_LEVEL=INFO` - Show informational messages
+- `LOG_LEVEL=DEBUG` - Show detailed debug information
 
 This ensures you always get the most up-to-date data from the Opinion prediction market while respecting API limits and timeouts.
 

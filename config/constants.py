@@ -28,6 +28,7 @@ ENV_QUOTE_TOKENS_CACHE_TTL = "QUOTE_TOKENS_CACHE_TTL"
 ENV_ENABLE_TRADING_CHECK_INTERVAL = "ENABLE_TRADING_CHECK_INTERVAL"
 ENV_RATE_LIMIT = "RATE_LIMIT"
 ENV_TIMEOUT = "TIMEOUT"
+ENV_LOG_LEVEL = "LOG_LEVEL"
 
 
 class MarketStatus(str, Enum):
@@ -184,3 +185,47 @@ class DefaultValues:
     EMPTY_ORDERBOOK = {"bids": [], "asks": []}
     EMPTY_MARKET_LIST = []
     EMPTY_CHILD_MARKETS = []
+
+
+# Display Constants
+class DisplayConstants:
+    """Display-related constants."""
+
+    # Table display settings
+    MAX_TITLE_WIDTH = 50
+    MAX_ID_LENGTH = 12
+    TABLE_WIDTH = 120
+    ORDERBOOK_LEVELS = 5
+
+    # Formatting precision
+    VOLUME_PRECISION = 2
+    PERCENTAGE_PRECISION = 1
+
+    # Orderbook column widths
+    ORDERBOOK_COLUMNS = {
+        "total": 12,
+        "size": 8,
+        "price": 8,
+        "separator": 2,
+    }
+
+    # Color scheme
+    COLORS = {
+        "success": "green",
+        "error": "red",
+        "warning": "yellow",
+        "info": "cyan",
+    }
+
+
+# Logging Constants
+class LoggingConstants:
+    """Logging-related constants."""
+
+    VALID_LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    DEFAULT_LOG_LEVEL = None  # Disabled by default
+
+    # Log formats
+    DETAILED_FORMAT = "<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan> - <level>{message}</level>"
+    SIMPLE_FORMAT = "<level>{level: <8}</level> | <level>{message}</level>"
+    MINIMAL_FORMAT = "<level>{message}</level>"

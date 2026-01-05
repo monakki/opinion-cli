@@ -1,5 +1,11 @@
 # Opinion CLI
 
+[![GitHub Repository](https://img.shields.io/badge/GitHub-monakki%2Fopinion--cli-blue?logo=github)](https://github.com/monakki/opinion-cli)
+[![Python](https://img.shields.io/badge/Python-3.14+-blue?logo=python)](https://python.org)
+[![uv](https://img.shields.io/badge/uv-package%20manager-orange?logo=python)](https://docs.astral.sh/uv/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![Support](https://img.shields.io/badge/Support-BSC%2FEVM-yellow?logo=binance)](https://github.com/monakki/opinion-cli#support-the-project)
+
 **Powerful command line interface for Opinion prediction market**
 
 Monitor markets, analyze positions, track trades, and manage your portfolio with ease. Get real-time insights into any user's trading activity by wallet address, view your own balances and orders, with upcoming trading features to open/close positions and manage orders.
@@ -11,12 +17,6 @@ Monitor markets, analyze positions, track trades, and manage your portfolio with
 ✅ **Personal Dashboard** - Check your balances and manage your orders  
 ✅ **Real-time Data** - Live market data with automatic pagination  
 🚧 **Trading Functions** - Open/close positions, cancel orders *(coming soon)*
-
-[![GitHub Repository](https://img.shields.io/badge/GitHub-monakki%2Fopinion--cli-blue?logo=github)](https://github.com/monakki/opinion-cli)
-[![Python](https://img.shields.io/badge/Python-3.14+-blue?logo=python)](https://python.org)
-[![uv](https://img.shields.io/badge/uv-package%20manager-orange?logo=python)](https://docs.astral.sh/uv/)
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![Support](https://img.shields.io/badge/Support-BSC%2FEVM-yellow?logo=binance)](https://github.com/monakki/opinion-cli#support-the-project)
 
 ## Prerequisites
 

@@ -23,13 +23,12 @@ class OrdersDisplayer:
         table.add_column(
             "Order ID", style="cyan", width=OrdersConstants.ORDER_ID_MAX_LENGTH
         )
-        table.add_column(
-            "Market", style="white", width=OrdersConstants.MARKET_TITLE_MAX_LENGTH
-        )
+        table.add_column("Market", style="white", max_width=30)
         table.add_column("Side", style="bold")
         table.add_column("Outcome", style="yellow")
         table.add_column("Price", style="green", justify="right")
         table.add_column("Size", style="blue", justify="right")
+        table.add_column("Total", style="cyan", justify="right")
         table.add_column("Filled", style="magenta", justify="right")
         table.add_column("Status", style="bold")
         table.add_column("Created", style="dim")
@@ -40,12 +39,15 @@ class OrdersDisplayer:
             if len(order_id) > OrdersConstants.ORDER_ID_MAX_LENGTH:
                 order_id = order_id[: OrdersConstants.ORDER_ID_TRUNCATE_LENGTH] + "..."
 
-            # Format market title (truncate if too long)
+            # Format market title with root market title
             market_title = str(order.get("market_title", ""))
-            if len(market_title) > OrdersConstants.MARKET_TITLE_MAX_LENGTH:
-                market_title = (
-                    market_title[: OrdersConstants.MARKET_TITLE_TRUNCATE_LENGTH] + "..."
-                )
+            root_market_title = str(order.get("root_market_title", ""))
+
+            # Create market display with root market title if available
+            if root_market_title and root_market_title != market_title:
+                market_display = f"{market_title} [dim italic not bold]({root_market_title})[/dim italic not bold]"
+            else:
+                market_display = market_title
 
             # Format side with color
             side_raw = order.get("side", "")
@@ -74,6 +76,14 @@ class OrdersDisplayer:
                 size_str = format_number(size, OrdersConstants.SIZE_PRECISION)
             except (ValueError, TypeError):
                 size_str = "N/A"
+                size = 0
+
+            # Calculate and format total from order_amount
+            try:
+                total = float(order.get("order_amount", 0))
+                total_str = f"${total:.2f}"
+            except (ValueError, TypeError):
+                total_str = "N/A"
 
             try:
                 filled_size = float(order.get("filled_size", 0))
@@ -110,11 +120,12 @@ class OrdersDisplayer:
 
             table.add_row(
                 order_id,
-                market_title,
+                market_display,
                 side_text,
                 outcome,
                 price_str,
                 size_str,
+                total_str,
                 filled_str,
                 status_text,
                 created_str,

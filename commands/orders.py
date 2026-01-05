@@ -27,6 +27,114 @@ class OrdersParser:
             if hasattr(result, "list") and result.list:
                 orders = []
                 for order in result.list:
+                    # Get order shares and filled shares
+                    order_shares = getattr(order, "order_shares", "0")
+                    filled_shares = getattr(order, "filled_shares", "0")
+
+                    # Calculate remaining shares
+                    try:
+                        remaining_shares = str(
+                            float(order_shares) - float(filled_shares)
+                        )
+                    except (ValueError, TypeError):
+                        remaining_shares = "0"
+
+                    orders.append(
+                        {
+                            "order_id": getattr(order, "order_id", ""),
+                            "market_id": getattr(order, "market_id", ""),
+                            "market_title": getattr(order, "market_title", ""),
+                            "root_market_title": getattr(
+                                order, "root_market_title", ""
+                            ),
+                            "side": getattr(order, "side", ""),
+                            "outcome": getattr(order, "outcome", ""),
+                            "price": getattr(order, "price", "0"),
+                            "order_amount": getattr(order, "order_amount", "0"),
+                            "size": order_shares,
+                            "filled_size": filled_shares,
+                            "remaining_size": remaining_shares,
+                            "status": getattr(order, "status", ""),
+                            "status_enum": getattr(order, "status_enum", ""),
+                            "created_at": getattr(order, "created_at", ""),
+                            "updated_at": getattr(order, "updated_at", ""),
+                            "quote_token": getattr(order, "quote_token", ""),
+                        }
+                    )
+
+                parsed["result"] = {
+                    "orders": orders,
+                    "total": getattr(result, "total", len(orders)),
+                    "page": getattr(result, "page", 1),
+                    "limit": getattr(result, "limit", 10),
+                }
+
+        return parsed
+
+    @staticmethod
+    def parse_orders_response_raw(response) -> Dict[str, Any]:
+        """Parse orders response keeping all original fields."""
+        parsed = {
+            "errno": getattr(response, "errno", None),
+            "errmsg": getattr(response, "errmsg", None),
+            "result": None,
+        }
+
+        if hasattr(response, "result") and response.result:
+            result = response.result
+            if hasattr(result, "list") and result.list:
+                orders = []
+                for order in result.list:
+                    # Convert order object to dict with all fields
+                    order_dict = {}
+                    for attr in dir(order):
+                        if not attr.startswith("_") and not callable(
+                            getattr(order, attr)
+                        ):
+                            try:
+                                value = getattr(order, attr)
+                                # Skip complex objects and methods
+                                if (
+                                    isinstance(value, (str, int, float, bool, list))
+                                    or value is None
+                                ):
+                                    order_dict[attr] = value
+                            except Exception:
+                                continue
+                    orders.append(order_dict)
+
+                parsed["result"] = {
+                    "orders": orders,
+                    "total": getattr(result, "total", len(orders)),
+                    "page": getattr(result, "page", 1),
+                    "limit": getattr(result, "limit", 10),
+                }
+
+        return parsed
+        """Parse orders response into a standardized format."""
+        parsed = {
+            "errno": getattr(response, "errno", None),
+            "errmsg": getattr(response, "errmsg", None),
+            "result": None,
+        }
+
+        if hasattr(response, "result") and response.result:
+            result = response.result
+            if hasattr(result, "list") and result.list:
+                orders = []
+                for order in result.list:
+                    # Get order shares and filled shares
+                    order_shares = getattr(order, "order_shares", "0")
+                    filled_shares = getattr(order, "filled_shares", "0")
+
+                    # Calculate remaining shares
+                    try:
+                        remaining_shares = str(
+                            float(order_shares) - float(filled_shares)
+                        )
+                    except (ValueError, TypeError):
+                        remaining_shares = "0"
+
                     orders.append(
                         {
                             "order_id": getattr(order, "order_id", ""),
@@ -35,9 +143,9 @@ class OrdersParser:
                             "side": getattr(order, "side", ""),
                             "outcome": getattr(order, "outcome", ""),
                             "price": getattr(order, "price", "0"),
-                            "size": getattr(order, "size", "0"),
-                            "filled_size": getattr(order, "filled_size", "0"),
-                            "remaining_size": getattr(order, "remaining_size", "0"),
+                            "size": order_shares,
+                            "filled_size": filled_shares,
+                            "remaining_size": remaining_shares,
                             "status": getattr(order, "status", ""),
                             "status_enum": getattr(order, "status_enum", ""),
                             "created_at": getattr(order, "created_at", ""),
@@ -155,11 +263,15 @@ def orders(
             page=page,
             auto_paginate=use_auto_paginate,
         )
-        parsed_data = OrdersParser.parse_orders_response(response)
 
         if json:
-            click.echo(JSONDisplayer.to_json_string(parsed_data))
+            # For JSON output, use raw parser to get all fields
+            raw_data = OrdersParser.parse_orders_response_raw(response)
+            click.echo(JSONDisplayer.to_json_string(raw_data))
             return
+
+        # For table output, use regular parser
+        parsed_data = OrdersParser.parse_orders_response(response)
 
         # Handle table format
         if parsed_data["errno"] == 0:

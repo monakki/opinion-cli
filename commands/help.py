@@ -29,7 +29,9 @@ def help():
     table.add_row("positions", "Show user's positions (portfolio)")
     table.add_row("trades", "Show user's trade history")
     table.add_row("orders", "Show user's orders with optional filters")
-    table.add_row("markets", "Fetch and display markets from Opinion Open API")
+    table.add_row(
+        "markets", "Fetch and display markets (supports search with -q/--search)"
+    )
     table.add_row("help", "Show this help message")
 
     # Display help

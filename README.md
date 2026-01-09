@@ -12,7 +12,8 @@ Monitor markets, analyze positions, track trades, and manage your portfolio with
 
 ## Features
 
-✅ **Market Analysis** - Browse and analyze prediction markets with advanced filtering  
+✅ **Market Analysis** - Browse and analyze prediction markets with advanced filtering and search  
+✅ **Market Search** - Find markets by title with smart auto-detection
 ✅ **Portfolio Tracking** - View positions and trades for any wallet address  
 ✅ **Personal Dashboard** - Check your balances and manage your orders  
 ✅ **Real-time Data** - Live market data with automatic pagination  
@@ -148,6 +149,37 @@ uv run markets 217
 uv run markets https://app.opinion.trade/detail?topicId=217
 uv run markets "https://app.opinion.trade/detail?topicId=61&type=multi"
 ```
+
+#### Market Search
+
+Search markets by title with automatic detection - simply provide search text as argument:
+
+```bash
+# Search for markets containing "bitcoin" (searches all available markets)
+uv run markets bitcoin
+
+# Search for markets with "AI prediction" 
+uv run markets "AI prediction"
+
+# Search with filters - search "crypto" in resolved markets only
+uv run markets crypto -s resolved
+
+# Search in binary markets only
+uv run markets ethereum -t 0
+
+# Limit search to first 100 markets (faster)
+uv run markets bitcoin -l 100
+
+# Explicit search option (same as above)
+uv run markets --search bitcoin
+uv run markets -q "AI prediction"
+```
+
+**Search Features:**
+- **Unlimited by default**: Searches through all available markets
+- **Case-insensitive**: "Bitcoin", "bitcoin", "BITCOIN" all work the same
+- **Partial matching**: "bit" will find "Bitcoin" markets
+- **Child market search**: Also searches titles of categorical market options
 
 #### Filtering and Sorting
 
